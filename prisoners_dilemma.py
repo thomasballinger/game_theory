@@ -6,6 +6,7 @@ prints out initial strategies and strategies of the 15 survivors at the end
 
 import random
 import itertools
+import logging
 from strategies import *
 from collections import defaultdict
 
@@ -52,7 +53,7 @@ class Player(object):
 ## game functions
 
 ## a single encounter consists of 1 game, described below
-def play(player1, player2, toPrint1=False, toPrint2=False):
+def play(player1, player2):
 
     ## prisoner's dilemma parameters
     defect_payoff_if_opp_cooperates = 7
@@ -60,24 +61,22 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
     both_defect_payoff = 1 # n for Nash Equilibrium
 
     ## debugging
-    if toPrint2:
-        print 'player '+str(player1.__str__())+' vs '+str(player2.__str__())
-        print 'player1 points before playing ', player1.points
-        print 'player2 points before playing ', player2.points
-        if len(player1.allplays) >= len(Player.playerlist) - 1:
-            print 'last matchup between the players', player1.plays[player2][-1], player2.plays[player1][-1]
+    logging.info('player '+str(player1.__str__())+' vs '+str(player2.__str__()))
+    logging.info('player1 points before playing %s', player1.points)
+    logging.info('player2 points before playing %s', player2.points)
+    if len(player1.plays[player2]) >= 1:
+        logging.info('last matchup between the players: %s %s', player1.plays[player2][-1], player2.plays[player1][-1])
 
     if player1 is player2:
-        return None
+        raise Exception("Logic error: game against self")
 
-    if toPrint1:
+    logging.debug('player %s all plays: %s', player1, player1.allplays)
+    logging.debug('player %s plays: %s', player1, player1.plays)
+    logging.debug('player %s plays against opp: %s', player1, player1.plays[player2])
+    logging.debug('player %s all plays: %s', player2, player2.allplays)
+    logging.debug('player %s plays: %s', player2, player2.plays)
+    logging.debug('player %s plays against opp: %s', player2, player2.plays[player1])
 
-        print 'player '+player1.__str__()+'all plays=', player1.allplays
-        print 'player '+player1.__str__()+'plays', player1.plays
-        print 'player '+player1.__str__()+'plays against opp', player1.plays[player2]
-        print 'player '+player2.__str__()+'all plays=', player2.allplays
-        print 'player '+player2.__str__()+'plays', player2.plays
-        print 'player '+player2.__str__()+'plays against opp', player2.plays[player1]
     ## play below
     player1.decideplay(player2)
     player2.decideplay(player1)
@@ -98,11 +97,9 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         #print 'both cooperateerate'
         player1.addpoints(both_cooperate_payoff)
         player2.addpoints(both_cooperate_payoff)
-    if toPrint2:
-        print 'player1 points after playing ', player1.points
-        print 'player2 points after playing ', player2.points
-        print '############# next match ##########'
-
+    logging.info('player1 points after playing %d', player1.points)
+    logging.info('player2 points after playing %d', player2.points)
+    logging.info('############# next match ##########')
 
 def play_multiple_rounds(numrounds):
     for t in range(numrounds):
