@@ -11,7 +11,6 @@ from strategies import *
 from collections import defaultdict
 
 class Player(object):
-    playerlist = []
     def __init__(self, name, strat, num_rounds, points=0, plays=None, allplays=None):
         '''points: stores points accrued in a single generation or set of games
         strat = strategy, defined above
@@ -27,8 +26,6 @@ class Player(object):
             self.allplays = []
         else:
             self.allplays = allplays
-        ## playerlist gets modified when a player is instantiated
-        self.playerlist.append(self)
     def addpoints(self, points):
         self.points += points
     def play(self, opp):
@@ -99,27 +96,23 @@ def play_multiple_rounds(players, numrounds):
         for p1, p2 in itertools.combinations(players, 2):
             play(p1, p2)
 
-def order_players(players=Player.playerlist):
+def generation_survivors(players, rounds, num_die):
+    play_multiple_rounds(players, rounds)
     players.sort()
+    players = players[num_die:]
+    return players
 
 def evolve1(players, numgens, numyears_pergen, num_players, num_die):
     '''numgens = int, number of iterations
     numyears_pergen = int, number of times each team will 'play' before the selection happens'''
     ## new team gets new name
     for i in range(numgens):
-        play_multiple_rounds(players, numyears_pergen)
-        players.sort()
-        players = players[:num_die]
+        players = generation_survivors(players, numyears_pergen, num_die)
         for player in players:
             player.endgen()
         players += [Player(i, random.choice(strat_list), num_players) for _ in range(num_die)]
     ## play one more generation without replacing
-    play_multiple_rounds(players, numyears_pergen)
-    players.sort()
-    players = players[:num_die]
-    for player in players:
-        print player.strat
-    return players
+    return generation_survivors(players, numyears_pergen, num_die)
 
 ## incredibly variable results!!
 def evolve2(players, numgens, numyears_pergen, num_players, num_die):
@@ -133,21 +126,12 @@ def evolve2(players, numgens, numyears_pergen, num_players, num_die):
             if random.random() < mutation_parameter:
                 player.strat = random.choice(strat_list)
                 logging.info('mutation!! new strategy= %s', player.strat)
-        play_multiple_rounds(players, numyears_pergen)
-        players.sort()
-        players = players[num_die:]
+        players = generation_survivors(players, numyears_pergen, num_die)
         players += [Player(i, winner.strat, num_players) for winner in players[-1:-(1+num_die):-1]]
-        for player in Player.playerlist:
+        for player in players:
             player.endgen()
     ## play one more generation without replacing
-    play_multiple_rounds(players, numyears_pergen)
-    players.sort()
-    players = players[num_die:]
-    print '#### FINAL SURVIVORS ########'
-    for player in players:
-        print player.strat
-    return players
-
+    return generation_survivors(players, numyears_pergen, num_die)
 
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
 strat_list = [mostly_tit_for_tat,
@@ -195,4 +179,7 @@ if __name__ == '__main__':
         print '####### INITIAL PLAYERS ##########'
         for player in players:
             print player.strat
-        evolve2(players, 100, 10, 20, 3)
+        players = evolve2(players, 100, 10, 20, 3)
+        print '#### FINAL SURVIVORS ########'
+        for player in players:
+            print player.strat
