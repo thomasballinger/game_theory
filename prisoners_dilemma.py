@@ -7,32 +7,6 @@ prints out initial strategies and strategies of the 15 survivors at the end
 import random
 from strategies import *
 
-numplayers = 20
-## decide which program to run
-simplesimulation = False
-evolution = True
-
-## prisoner's dilemma parameters
-defect_payoff_if_opp_cooperates = 7
-both_cooperate_payoff = 5
-both_defect_payoff = 1 # n for Nash Equilibrium
-
-
-## list with strategies to be used in simulation (modify to include more or fewer strategies)
-strat_list = [mostly_tit_for_tat,
-        mostly_cooperate,
-        tit_for_tat_opp,
-        tit_for_tat_2,
-        always_defect,
-        mostly_random_play,
-        clever,
-        mostly_defect,
-        tit_for_two_tat,
-        tit_for_tat_forgiving]
-
-
-
-
 class Player(object):
     playerlist = []
     def __init__(self, name, strat, points=0, plays=None, allplays=None):
@@ -77,11 +51,16 @@ class Player(object):
     def __str__(self):
         return self.name
 
-
 ## game functions
 
 ## a single encounter consists of 1 game, described below
 def play(player1, player2, toPrint1=False, toPrint2=False):
+
+    ## prisoner's dilemma parameters
+    defect_payoff_if_opp_cooperates = 7
+    both_cooperate_payoff = 5
+    both_defect_payoff = 1 # n for Nash Equilibrium
+
     ## debugging
     if toPrint2:
         print 'player '+str(player1.__str__())+' vs '+str(player2.__str__())
@@ -126,6 +105,24 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         print 'player2 points after playing ', player2.points
         print '############# next match ##########'
 
+
+numplayers = 20
+## decide which program to run
+simplesimulation = False
+evolution = True
+
+
+## list with strategies to be used in simulation (modify to include more or fewer strategies)
+strat_list = [mostly_tit_for_tat,
+        mostly_cooperate,
+        tit_for_tat_opp,
+        tit_for_tat_2,
+        always_defect,
+        mostly_random_play,
+        clever,
+        mostly_defect,
+        tit_for_two_tat,
+        tit_for_tat_forgiving]
 
 ## define some players for a simple simulation
 if simplesimulation:
