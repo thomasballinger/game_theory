@@ -7,28 +7,27 @@ prints out initial strategies and strategies of the 15 survivors at the end
 import random
 import itertools
 from strategies import *
+from collections import defaultdict
 
 class Player(object):
     playerlist = []
     def __init__(self, name, strat, num_rounds, points=0, plays=None, allplays=None):
         '''points: stores points accrued in a single generation or set of games
         strat = strategy, defined above
-        plays =  list of lists storing plays made against each opponent
+        plays = dictionary of lists storing plays made against each opponent
         allplays = list of all plays made: this might be unnecessary'''
         self.name = name
         self.strat = strat
         self.points = points
-        if plays is None:
-            self.plays = [[] for _ in range(num_rounds)]
-        else:
-            self.plays = plays
+        self.plays = defaultdict(list)
+        if plays is not None:
+            self.plays.update(plays)
         if allplays is None:
             self.allplays = []
         else:
             self.allplays = allplays
-        ## playerlist gets modified when a player is instantiated, and the correct index is assigned to the player
+        ## playerlist gets modified when a player is instantiated
         self.playerlist.append(self)
-        self.index = self.playerlist.index(self)
         self.nextplay = None
     def addpoints(self, points):
         self.points += points
@@ -40,7 +39,7 @@ class Player(object):
     def makeplay(self, opp):
         play = self.nextplay
         self.allplays.append(play)
-        self.plays[opp.index].append(play)
+        self.plays[opp].append(play)
         return play
     def __lt__(self, other):
         return self.points < other.points
@@ -66,7 +65,7 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         print 'player1 points before playing ', player1.points
         print 'player2 points before playing ', player2.points
         if len(player1.allplays) >= len(Player.playerlist) - 1:
-            print 'last matchup between the players', player1.plays[player2.index][-1], player2.plays[player1.index][-1]
+            print 'last matchup between the players', player1.plays[player2][-1], player2.plays[player1][-1]
 
     if player1 is player2:
         return None
@@ -75,10 +74,10 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
 
         print 'player '+player1.__str__()+'all plays=', player1.allplays
         print 'player '+player1.__str__()+'plays', player1.plays
-        print 'player '+player1.__str__()+'plays against opp', player1.plays[player2.index]
+        print 'player '+player1.__str__()+'plays against opp', player1.plays[player2]
         print 'player '+player2.__str__()+'all plays=', player2.allplays
         print 'player '+player2.__str__()+'plays', player2.plays
-        print 'player '+player2.__str__()+'plays against opp', player2.plays[player1.index]
+        print 'player '+player2.__str__()+'plays against opp', player2.plays[player1]
     ## play below
     player1.decideplay(player2)
     player2.decideplay(player1)
@@ -249,7 +248,6 @@ evolve2(1000, 10, 20, 3)
 
     # print str(Player.playerlist)
     #     for player in Player.playerlist:
-    #     print player.index
     #     play(player2, player4)
     #     play(player2, player4)
     #     play(player4, player5)
