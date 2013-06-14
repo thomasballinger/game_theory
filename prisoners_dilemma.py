@@ -22,7 +22,16 @@ both_defect_payoff = 1 # n for Nash Equilibrium
 
 
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
-strat_list = [mostly_tit_for_tat,mostly_cooperate,tit_for_tat_opp,tit_for_tat_2,always_defect,mostlyrandomplay,clever,mostly_defect,tit_for_two_tat,tit_for_tat_forgiving]
+strat_list = [mostly_tit_for_tat,
+        mostly_cooperate,
+        tit_for_tat_opp,
+        tit_for_tat_2,
+        always_defect,
+        mostly_random_play,
+        clever,
+        mostly_defect,
+        tit_for_two_tat,
+        tit_for_tat_forgiving]
 
 
 

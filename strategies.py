@@ -8,7 +8,7 @@ tit_for_tat_param = 0.1
 mutation_parameter = 0.02
 
 ## strategies
-def mostlyrandomplay(player1,player2):
+def mostly_random_play(player1,player2):
     ## check if last three plays by the opponent against you were defect
     if player2.plays[player1.index][-3:] == ['defect','defect','defect']:
         return 'defect'
