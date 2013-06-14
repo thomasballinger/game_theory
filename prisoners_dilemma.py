@@ -143,24 +143,17 @@ def get_similar_players(numplayers, initial_strat):
     players = [Player(i, initial_strat, numplayers) for i in range(numplayers)]
     return players
 
-## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
-## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
-
 if __name__ == '__main__':
-    ## decide which program to run
-    simple_simulation = False
-    evolution = True
+    #print get_simple_simulation_players()
 
-    if simple_simulation:
-        players = get_simple_simulation_players()
-        print players
-    elif evolution:
-        players = get_similar_players(20, strategies.mostly_defect)
-        ## modify the initial strategy to see which strategies are prone to invasion, or make it random
-        print '####### INITIAL PLAYERS ##########'
-        for player in players:
-            print player.strat
-        players = evolve2(players, 100, 10, 20, 3)
-        print '#### FINAL SURVIVORS ########'
-        for player in players:
-            print player.strat
+    ## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
+    ## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
+    players = get_similar_players(20, strategies.mostly_defect)
+    ## modify the initial strategy to see which strategies are prone to invasion, or make it random
+    print '####### INITIAL PLAYERS ##########'
+    for player in players:
+        print player.strat
+    players = evolve2(players, 100, 10, 20, 3)
+    print '#### FINAL SURVIVORS ########'
+    for player in players:
+        print player.strat
