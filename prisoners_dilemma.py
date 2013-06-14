@@ -1,7 +1,7 @@
 import random
 
 ## prisoner's dilemma game, with evolution and selection
-## if executed without modification, instantiates 20 players who mostly defect, but the population can 
+## if executed without modification, instantiates 20 players who mostly defect, but the population can
 ## be invaded by the other strategies over the 1000 'generations' iterated in the function 'evolve2'
 ## prints out initial strategies and strategies of the 15 survivors at the end
 
@@ -28,7 +28,7 @@ c = 5
 ## both defect payoff, n for nash equilib
 n = 1
 
-## strategies 
+## strategies
 def mostlyrandomplay(player1,player2):
     ## check if last three plays by the opponent against you were defect
     if player2.plays[player1.index][-3:] == ['defect','defect','defect']:
@@ -36,10 +36,10 @@ def mostlyrandomplay(player1,player2):
     else:
         l = ['cooperate','defect']
         return random.choice(l)
-    
+
 def always_cooperate(player1,player2):
     return 'cooperate'
-    
+
 def clever(player1,player2):
     ## check if last two plays were cooperate. if so, take advantage!
     if player2.plays[player1.index][-2:] == ['cooperate','cooperate']:
@@ -49,10 +49,10 @@ def clever(player1,player2):
         return 'defect'
     else:
         return 'cooperate'
-    
+
 def always_defect(player1,player2):
-    return 'defect'   
-    
+    return 'defect'
+
 def mostly_defect(player1,player2):
     if random.random() < percentagedefect:
         return 'defect'
@@ -81,7 +81,7 @@ def tit_for_tat_2(player1,player2):
     elif player2.plays[player1.index][-1] == 'defect':
         return 'defect'
 
-        
+
 def tit_for_tat_opp(player1,player2):
     '''opposite of tit for tat, with exceptions'''
     ## initial play
@@ -97,7 +97,7 @@ def tit_for_tat_opp(player1,player2):
         return 'defect'
     elif player2.plays[player1.index][-1] == 'defect':
         return 'cooperate'
-    
+
 
 def mostly_cooperate(player1,player2):
     ## check for serial defector
@@ -114,7 +114,7 @@ def mostly_tit_for_tat(player1,player2):
         return tit_for_tat_2(player1,player2)
     else:
         return 'defect'
-        
+
 def tit_for_two_tat(player1,player2):
     '''more forgiving'''
     if len(player2.plays[player1.index]) <= 1:
@@ -123,7 +123,7 @@ def tit_for_two_tat(player1,player2):
         return 'defect'
     else:
         return 'cooperate'
-        
+
 def tit_for_tat_forgiving(player1,player2):
     if player2.plays[player1.index] == []:
         return 'cooperate'
@@ -134,15 +134,15 @@ def tit_for_tat_forgiving(player1,player2):
             return 'cooperate'
         else:
             return 'defect'
-    
 
-    
-        
+
+
+
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
-strat_list = [mostly_tit_for_tat,mostly_cooperate,tit_for_tat_opp,tit_for_tat_2,always_defect,mostlyrandomplay,clever,mostly_defect,tit_for_two_tat,tit_for_tat_forgiving] 
+strat_list = [mostly_tit_for_tat,mostly_cooperate,tit_for_tat_opp,tit_for_tat_2,always_defect,mostlyrandomplay,clever,mostly_defect,tit_for_two_tat,tit_for_tat_forgiving]
 
 
- 
+
 
 ## player class defined in file classes
 
@@ -172,7 +172,7 @@ class Player(object):
         self.nextplay = None
     def addpoints(self,points):
         self.points += points
-    
+
     def decideplay(self,opp):
         play = self.strat(self,opp)
         self.nextplay = play
@@ -189,7 +189,7 @@ class Player(object):
         self.points = 0
     def __str__(self):
         return self.name
-        
+
 
 ## game functions
 
@@ -202,12 +202,12 @@ def play(player1,player2, toPrint1 = False, toPrint2 = False):
         print 'player2 points before playing ', player2.points
         if len(player1.allplays) >= numplayers - 1:
             print 'last matchup between the players', player1.plays[player2.index][-1],player2.plays[player1.index][-1]
-        
+
     if player1 == player2:
         return None
-    
+
     if toPrint1:
-        
+
         print 'player '+player1.__str__()+'all plays=', player1.allplays
         print 'player '+player1.__str__()+'plays', player1.plays
         print 'player '+player1.__str__()+'plays against opp', player1.plays[player2.index]
@@ -219,7 +219,7 @@ def play(player1,player2, toPrint1 = False, toPrint2 = False):
     player2.decideplay(player1)
     player1play = player1.makeplay(player2)
     player2play = player2.makeplay(player1)
-    ## assign points based on prisoner's dilemma 
+    ## assign points based on prisoner's dilemma
     if player1play == player2play == 'defect':
         player1.addpoints(n)
         player2.addpoints(n)
@@ -264,7 +264,7 @@ if evolution:
     for player in playerlist:
         print player.strat
 
-## below, randomizing the order of the individual games in a round        
+## below, randomizing the order of the individual games in a round
 playerorder = range(numplayers)
 
 ## make a new list that's identical to playerlist, but that we can modify without modifying global playerlist
@@ -275,15 +275,15 @@ for i in range(numplayers):
 def all_matches():
     '''list of all matchups in a single round (that is, every player plays every other player once), numteams+1 choose 2 games'''
     list_tups = []
-    # print numplayers  
+    # print numplayers
     for j in range(numplayers):
         for i in range(j+1,numplayers):
             list_tups.append((i,j))
-            
+
     random.shuffle(list_tups)
     return list_tups
 
-   
+
 
 def play_oneround_randomorder(toPrint = False):
     l = all_matches()
@@ -295,24 +295,24 @@ def play_oneround_randomorder(toPrint = False):
 
 ## i think the next two functions are identical. im not sure why i defined them both, now, but i'm worried
 #3 they're actually different, so keeping them for now
-        
+
 def play_multiple_rounds(numrounds):
     for t in range(numrounds):
         play_oneround_randomorder()
-    
-    
+
+
 def play_each_other(numrounds):
     for t in range(numrounds):
         random.shuffle(playerorder)
-       
-        
+
+
         for j in range(numplayers):
             for i in range(j+1,numplayers):
                 play(playerorder[i],playerorder[j])
 
 def order_players(players = playerlist):
-    players.sort()   
-       
+    players.sort()
+
 ## one more parameter to decide how many players 'die' after each full round (or 'generation')
 cruel_selection = 3
 
@@ -340,8 +340,8 @@ def evolve1(numgens,numyears_pergen):
         playerlist.pop(0)
     for player in playerlist:
         print player.strat
- 
-## incredibly variable results!!        
+
+## incredibly variable results!!
 def evolve2(numgens,numyears_pergen):
     '''boots out the losing players, replicates the winning players instead of random ones,
      and mutates each player with a fixed probability
@@ -370,51 +370,51 @@ def evolve2(numgens,numyears_pergen):
     print '#### FINAL SURVIVORS ########'
     for player in playerlist:
         print player.strat
-        
+
 # def evolve3(numgens,numyears_pergen):
-    
-    
-        
+
+
+
 ## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
 ## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
-      
+
 evolve2(1000,10)
-        
-  
-      
-        
+
+
+
+
 
 
 
 
 # if __name__ == '__main__':
-# 
+#
 #     play_multiple_rounds(10)
 #     for i in range(len(playerlist)):
 #         print str(playerlist[i].__str__()) + '\'s'+'points=' + str(playerlist[i].points) + '   ',str(playerlist[i].strat)
 #     order_players()
-#     
-#   
-#     
-#    
-#     
-#     
+#
+#
+#
+#
+#
+#
 
     # print str(playerlist)
     #     for player in playerlist:
     #     print player.index
     #     play(player2,player4)
     #     play(player2,player4)
-    #     play(player4,player5) 
+    #     play(player4,player5)
     #     print 'player 4 plays', player4.plays
     #     print 'player 2 plays', player2.plays
     #     print 'player 5 plays', player5.plays
-    # 
-    #     
+    #
+    #
     #     print 'player2 points', player2.points
     #     print 'player 4 points',player4.points
     #     print 'player 5 points', player5.points
 
 
-    
-    
+
+
