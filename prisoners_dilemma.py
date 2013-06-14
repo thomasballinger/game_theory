@@ -5,6 +5,7 @@ prints out initial strategies and strategies of the 15 survivors at the end
 """
 
 import random
+import itertools
 from strategies import *
 
 class Player(object):
@@ -155,15 +156,9 @@ playorder = Player.playerlist[:]
 
 def all_matches(players):
     '''list of all matchups in a single round (that is, every player plays every other player once), numteams+1 choose 2 games'''
-    list_tups = []
-    # print numplayers
-    for j in range(len(players)):
-        for i in range(j+1, len(players)):
-            list_tups.append((i, j))
-
+    list_tups = list(itertools.combinations(range(len(players)), 2))
     random.shuffle(list_tups)
     return list_tups
-
 
 def play_oneround_randomorder(toPrint=False):
     l = all_matches(Player.playerlist)
