@@ -16,14 +16,9 @@ simplesimulation = False
 evolution = True
 
 ## prisoner's dilemma parameters
-##defect payoff if opp cooperateerates
-d = 7
-## both cooperateerate payoff
-c = 5
-## both defect payoff, n for nash equilib
-n = 1
-
-
+defect_payoff_if_opp_cooperates = 7
+both_cooperate_payoff = 5
+both_defect_payoff = 1 # n for Nash Equilibrium
 
 
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
@@ -109,19 +104,19 @@ def play(player1,player2, toPrint1 = False, toPrint2 = False):
     player2play = player2.makeplay(player1)
     ## assign points based on prisoner's dilemma
     if player1play == player2play == 'defect':
-        player1.addpoints(n)
-        player2.addpoints(n)
+        player1.addpoints(both_defect_payoff)
+        player2.addpoints(both_defect_payoff)
         #print 'both defect'
     elif player1play == 'defect' and player2play == 'cooperate':
-        player1.addpoints(d)
+        player1.addpoints(defect_payoff_if_opp_cooperates)
         #print 'first player defects, second cooperateerates'
     elif player2play == 'defect' and player1play == 'cooperate':
-        player2.addpoints(d)
+        player2.addpoints(defect_payoff_if_opp_cooperates)
         #print 'first player cooperateerates, second defects'
     else:
         #print 'both cooperateerate'
-        player1.addpoints(c)
-        player2.addpoints(c)
+        player1.addpoints(both_cooperate_payoff)
+        player2.addpoints(both_cooperate_payoff)
     if toPrint2:
         print 'player1 points after playing ', player1.points
         print 'player2 points after playing ', player2.points
