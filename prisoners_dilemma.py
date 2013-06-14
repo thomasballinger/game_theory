@@ -153,21 +153,20 @@ if evolution:
 playorder = Player.playerlist[:]
 
 
-def all_matches():
+def all_matches(players):
     '''list of all matchups in a single round (that is, every player plays every other player once), numteams+1 choose 2 games'''
     list_tups = []
     # print numplayers
-    for j in range(numplayers):
-        for i in range(j+1, numplayers):
+    for j in range(len(players)):
+        for i in range(j+1, len(players)):
             list_tups.append((i, j))
 
     random.shuffle(list_tups)
     return list_tups
 
 
-
 def play_oneround_randomorder(toPrint=False):
-    l = all_matches()
+    l = all_matches(Player.playerlist)
     for tup in l:
         play(Player.playerlist[tup[0]], Player.playerlist[tup[1]])
     if toPrint:
