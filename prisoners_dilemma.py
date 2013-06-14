@@ -29,16 +29,11 @@ class Player(object):
             self.allplays = allplays
         ## playerlist gets modified when a player is instantiated
         self.playerlist.append(self)
-        self.nextplay = None
     def addpoints(self, points):
         self.points += points
 
-    def decideplay(self, opp):
-        play = self.strat(self, opp)
-        self.nextplay = play
-        return play
     def makeplay(self, opp):
-        play = self.nextplay
+        play = self.strat(self, opp)
         self.allplays.append(play)
         self.plays[opp].append(play)
         return play
@@ -78,8 +73,6 @@ def play(player1, player2):
     logging.debug('player %s plays against opp: %s', player2, player2.plays[player1])
 
     ## play below
-    player1.decideplay(player2)
-    player2.decideplay(player1)
     player1play = player1.makeplay(player2)
     player2play = player2.makeplay(player1)
 
