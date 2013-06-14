@@ -45,6 +45,7 @@ class Player(object):
 
 ## a single encounter consists of 1 game, described below
 def play(player1, player2):
+    if player1 is player2: raise Exception("Logic error: game against self")
 
     ## prisoner's dilemma parameters
     defect_payoff_if_opp_cooperates = 7
@@ -56,10 +57,6 @@ def play(player1, player2):
     logging.info('player2 points before playing %s', player2.points)
     if len(player1.plays[player2]) >= 1:
         logging.info('last matchup between the players: %s %s', player1.plays[player2][-1], player2.plays[player1][-1])
-
-    if player1 is player2:
-        raise Exception("Logic error: game against self")
-
     logging.debug('player %s all plays: %s', player1, player1.allplays)
     logging.debug('player %s plays: %s', player1, player1.plays)
     logging.debug('player %s plays against opp: %s', player1, player1.plays[player2])
@@ -67,7 +64,6 @@ def play(player1, player2):
     logging.debug('player %s plays: %s', player2, player2.plays)
     logging.debug('player %s plays against opp: %s', player2, player2.plays[player1])
 
-    ## play below
     player1play = player1.play(player2)
     player2play = player2.play(player1)
 
@@ -97,6 +93,8 @@ def play_multiple_rounds(players, numrounds):
             play(p1, p2)
 
 def generation_survivors(players, rounds, num_die):
+    for player in players:
+        player.endgen()
     play_multiple_rounds(players, rounds)
     players.sort()
     players = players[num_die:]
@@ -105,32 +103,24 @@ def generation_survivors(players, rounds, num_die):
 def evolve1(players, numgens, numyears_pergen, num_players, num_die):
     '''numgens = int, number of iterations
     numyears_pergen = int, number of times each team will 'play' before the selection happens'''
-    ## new team gets new name
-    for i in range(numgens):
+    for generation in range(numgens):
         players = generation_survivors(players, numyears_pergen, num_die)
-        for player in players:
-            player.endgen()
-        players += [Player(i, random.choice(strat_list), num_players) for _ in range(num_die)]
-    ## play one more generation without replacing
+        players += [Player(generation, random.choice(strat_list), num_players) for _ in range(num_die)]
     return generation_survivors(players, numyears_pergen, num_die)
 
 ## incredibly variable results!!
 def evolve2(players, numgens, numyears_pergen, num_players, num_die):
     '''boots out the losing players, replicates the winning players instead of random ones,
-    and mutates each player with a fixed probability
-    uncomment print statements to see it in action'''
+    and mutates each player with a fixed probability'''
     mutation_parameter = .2
-    for i in range(numgens):
+    for generation in range(numgens):
         assert len(players) / 2 >= num_die # because otherwise this strategy doesn't work
         for player in players:
             if random.random() < mutation_parameter:
                 player.strat = random.choice(strat_list)
                 logging.info('mutation!! new strategy= %s', player.strat)
         players = generation_survivors(players, numyears_pergen, num_die)
-        players += [Player(i, winner.strat, num_players) for winner in players[-1:-(1+num_die):-1]]
-        for player in players:
-            player.endgen()
-    ## play one more generation without replacing
+        players += [Player(generation, winner.strat, num_players) for winner in players[-1:-(1+num_die):-1]]
     return generation_survivors(players, numyears_pergen, num_die)
 
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
