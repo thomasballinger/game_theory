@@ -114,3 +114,13 @@ def tit_for_tat_forgiving(player1, player2):
         else:
             return 'defect'
 
+strats = [mostly_tit_for_tat,
+        mostly_cooperate,
+        tit_for_tat_opp,
+        tit_for_tat_2,
+        always_defect,
+        mostly_random_play,
+        clever,
+        mostly_defect,
+        tit_for_two_tat,
+        tit_for_tat_forgiving]

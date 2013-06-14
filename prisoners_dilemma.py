@@ -7,7 +7,7 @@ prints out initial strategies and strategies of the 15 survivors at the end
 import random
 import itertools
 import logging
-from strategies import *
+import strategies
 from collections import defaultdict
 
 class Player(object):
@@ -105,7 +105,7 @@ def evolve1(players, numgens, numyears_pergen, num_players, num_die):
     numyears_pergen = int, number of times each team will 'play' before the selection happens'''
     for generation in range(numgens):
         players = generation_survivors(players, numyears_pergen, num_die)
-        players += [Player(generation, random.choice(strat_list), num_players) for _ in range(num_die)]
+        players += [Player(generation, random.choice(strategies.strats), num_players) for _ in range(num_die)]
     return generation_survivors(players, numyears_pergen, num_die)
 
 ## incredibly variable results!!
@@ -117,34 +117,24 @@ def evolve2(players, numgens, numyears_pergen, num_players, num_die):
         assert len(players) / 2 >= num_die # because otherwise this strategy doesn't work
         for player in players:
             if random.random() < mutation_parameter:
-                player.strat = random.choice(strat_list)
+                player.strat = random.choice(strategies.strats)
                 logging.info('mutation!! new strategy= %s', player.strat)
         players = generation_survivors(players, numyears_pergen, num_die)
         players += [Player(generation, winner.strat, num_players) for winner in players[-1:-(1+num_die):-1]]
     return generation_survivors(players, numyears_pergen, num_die)
 
 ## list with strategies to be used in simulation (modify to include more or fewer strategies)
-strat_list = [mostly_tit_for_tat,
-        mostly_cooperate,
-        tit_for_tat_opp,
-        tit_for_tat_2,
-        always_defect,
-        mostly_random_play,
-        clever,
-        mostly_defect,
-        tit_for_two_tat,
-        tit_for_tat_forgiving]
 
 ## define some players for a simple simulation
 def get_simple_simulation_players():
-    players = [Player(1, tit_for_tat_2),
-               Player('titfortat2', tit_for_tat_2),
-               Player('defect', mostly_defect),
-               Player('clever', clever),
-               Player('mostly random', mostlyrandomplay),
-               Player('titfortat opp', tit_for_tat_opp),
-               Player('mostly cooperate', mostly_cooperate),
-               Player('mostly titfortat', mostly_tit_for_tat)]
+    players = [Player(1, strategies.tit_for_tat_2),
+               Player('titfortat2', strategies.tit_for_tat_2),
+               Player('defect', strategies.mostly_defect),
+               Player('clever', strategies.clever),
+               Player('mostly random', strategies.mostlyrandomplay),
+               Player('titfortat opp', strategies.tit_for_tat_opp),
+               Player('mostly cooperate', strategies.mostly_cooperate),
+               Player('mostly titfortat', strategies.mostly_tit_for_tat)]
     return players
 
 def get_similar_players(numplayers, initial_strat):
@@ -162,9 +152,10 @@ if __name__ == '__main__':
     evolution = True
 
     if simple_simulation:
-        do_simple_simulation()
-    if evolution:
-        players = get_similar_players(20, mostly_defect)
+        players = get_simple_simulation_players()
+        print players
+    elif evolution:
+        players = get_similar_players(20, strategies.mostly_defect)
         ## modify the initial strategy to see which strategies are prone to invasion, or make it random
         print '####### INITIAL PLAYERS ##########'
         for player in players:
