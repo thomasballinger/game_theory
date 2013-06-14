@@ -31,12 +31,11 @@ class Player(object):
         self.playerlist.append(self)
     def addpoints(self, points):
         self.points += points
-
-    def makeplay(self, opp):
-        play = self.strat(self, opp)
-        self.allplays.append(play)
-        self.plays[opp].append(play)
-        return play
+    def play(self, opp):
+        move = self.strat(self, opp)
+        self.allplays.append(move)
+        self.plays[opp].append(move)
+        return move
     def __lt__(self, other):
         return self.points < other.points
     def endgen(self):
@@ -73,8 +72,8 @@ def play(player1, player2):
     logging.debug('player %s plays against opp: %s', player2, player2.plays[player1])
 
     ## play below
-    player1play = player1.makeplay(player2)
-    player2play = player2.makeplay(player1)
+    player1play = player1.play(player2)
+    player2play = player2.play(player1)
 
     ## assign points based on prisoner's dilemma
     if player1play == player2play == 'defect':
