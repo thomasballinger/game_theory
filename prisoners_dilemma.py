@@ -10,7 +10,7 @@ from strategies import *
 
 class Player(object):
     playerlist = []
-    def __init__(self, name, strat, points=0, plays=None, allplays=None):
+    def __init__(self, name, strat, num_rounds, points=0, plays=None, allplays=None):
         '''points: stores points accrued in a single generation or set of games
         strat = strategy, defined above
         plays =  list of lists storing plays made against each opponent
@@ -19,9 +19,7 @@ class Player(object):
         self.strat = strat
         self.points = points
         if plays == None:
-            self.plays = []
-            for i in range(numplayers):
-                self.plays.append([])
+            self.plays = [[] for _ in range(num_rounds)]
         else:
             self.plays = plays
         if allplays == None:
@@ -67,7 +65,7 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         print 'player '+str(player1.__str__())+' vs '+str(player2.__str__())
         print 'player1 points before playing ', player1.points
         print 'player2 points before playing ', player2.points
-        if len(player1.allplays) >= numplayers - 1:
+        if len(player1.allplays) >= len(Player.playerlist) - 1:
             print 'last matchup between the players', player1.plays[player2.index][-1], player2.plays[player1.index][-1]
 
     if player1 == player2:
@@ -107,9 +105,75 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         print '############# next match ##########'
 
 
-numplayers = 20
+def play_multiple_rounds(numrounds):
+    for t in range(numrounds):
+        players = Player.playerlist[:]
+        random.shuffle(players)
+        for p1, p2 in itertools.combinations(players, 2):
+            play(p1, p2)
+
+def order_players(players=Player.playerlist):
+    players.sort()
+
+## one more parameter to decide how many players 'die' after each full round (or 'generation')
+
+def evolve1(numgens, numyears_pergen, num_players, num_die):
+    '''numgens = int, number of iterations
+    numyears_pergen = int, number of times each team will 'play' before the selection happens'''
+    ## new team gets new name
+    playernum = num_players + 1
+    for i in range(numgens):
+        play_multiple_rounds(numyears_pergen)
+        order_players()
+        for j in range(num_die):
+            ## kill off the losers
+            Player.playerlist.pop(0)
+            ## insert randoms
+            newstrat = random.choice(strat_list)
+            Player(i, newstrat, num_players)
+            # print 'new strategy ', newstrat
+        for player in Player.playerlist:
+            player.endgen()
+    ## play one more generation without replacing
+    play_multiple_rounds(numyears_pergen)
+    order_players()
+    for j in range(num_die):
+        Player.playerlist.pop(0)
+    for player in Player.playerlist:
+        print player.strat
+
+## incredibly variable results!!
+def evolve2(numgens, numyears_pergen, num_players, num_die):
+    '''boots out the losing players, replicates the winning players instead of random ones,
+     and mutates each player with a fixed probability
+     uncomment print statements to see it in action'''
+    playernum = num_players + 1
+    for i in range(numgens):
+        for t in range(len(Player.playerlist)):
+            if random.random() < mutation_parameter:
+                Player.playerlist[t].strat = random.choice(strat_list)
+                # print 'mutation!!!!'
+                # print 'new strategy= ', Player.playerlist[t].strat
+        play_multiple_rounds(numyears_pergen)
+        order_players()
+        for j in range(num_die):
+            Player.playerlist.pop(0)
+            newstrat = Player.playerlist[-j].strat
+            Player(i, newstrat, num_players)
+            # print 'new strategy = winning strategy =  ', newstrat
+        for player in Player.playerlist:
+            player.endgen()
+    ## play one more generation without replacing
+    play_multiple_rounds(numyears_pergen)
+    order_players()
+    for j in range(num_die):
+        Player.playerlist.pop(0)
+    print '#### FINAL SURVIVORS ########'
+    for player in Player.playerlist:
+        print player.strat
+
 ## decide which program to run
-simplesimulation = False
+simple_simulation = False
 evolution = True
 
 
@@ -126,7 +190,8 @@ strat_list = [mostly_tit_for_tat,
         tit_for_tat_forgiving]
 
 ## define some players for a simple simulation
-if simplesimulation:
+
+def do_simple_simulation():
     player1 = Player(1, tit_for_tat_2)
     player2 = Player('titfortat2', tit_for_tat_2)
     player3 = Player('defect', mostly_defect)
@@ -136,83 +201,15 @@ if simplesimulation:
     player7 = Player('mostly cooperate', mostly_cooperate)
     player8 = Player('mostly titfortat', mostly_tit_for_tat)
 
-
 ## for the evolution scenario
 ## some strategies impossible to invade, surprisingly, like tit for tat opposite
-if evolution:
+def do_evolution(numplayers):
     ## modify the initial strategy to see which strategies are prone to invasion, or make it random
     initial_strat = mostly_defect
     for i in range(numplayers):
-        Player(i, initial_strat)
+        Player(i, initial_strat, numplayers)
     ## comment out below for long simulations
     print '####### INITIAL PLAYERS ##########'
-    for player in Player.playerlist:
-        print player.strat
-
-def play_multiple_rounds(numrounds):
-    for t in range(numrounds):
-        players = Player.playerlist[:]
-        random.shuffle(players)
-        for p1, p2 in itertools.combinations(players, 2):
-            play(p1, p2)
-
-def order_players(players=Player.playerlist):
-    players.sort()
-
-## one more parameter to decide how many players 'die' after each full round (or 'generation')
-
-def evolve1(numgens, numyears_pergen, num_die):
-    '''numgens = int, number of iterations
-    numyears_pergen = int, number of times each team will 'play' before the selection happens'''
-    ## new team gets new name
-    playernum = numplayers + 1
-    for i in range(numgens):
-        play_multiple_rounds(numyears_pergen)
-        order_players()
-        for j in range(num_die):
-            ## kill off the losers
-            Player.playerlist.pop(0)
-            ## insert randoms
-            newstrat = random.choice(strat_list)
-            Player(i, newstrat)
-            # print 'new strategy ', newstrat
-        for player in Player.playerlist:
-            player.endgen()
-    ## play one more generation without replacing
-    play_multiple_rounds(numyears_pergen)
-    order_players()
-    for j in range(num_die):
-        Player.playerlist.pop(0)
-    for player in Player.playerlist:
-        print player.strat
-
-## incredibly variable results!!
-def evolve2(numgens, numyears_pergen, num_die):
-    '''boots out the losing players, replicates the winning players instead of random ones,
-     and mutates each player with a fixed probability
-     uncomment print statements to see it in action'''
-    playernum = numplayers + 1
-    for i in range(numgens):
-        for t in range(len(Player.playerlist)):
-            if random.random() < mutation_parameter:
-                Player.playerlist[t].strat = random.choice(strat_list)
-                # print 'mutation!!!!'
-                # print 'new strategy= ', Player.playerlist[t].strat
-        play_multiple_rounds(numyears_pergen)
-        order_players()
-        for j in range(num_die):
-            Player.playerlist.pop(0)
-            newstrat = Player.playerlist[-j].strat
-            Player(i, newstrat)
-            # print 'new strategy = winning strategy =  ', newstrat
-        for player in Player.playerlist:
-            player.endgen()
-    ## play one more generation without replacing
-    play_multiple_rounds(numyears_pergen)
-    order_players()
-    for j in range(num_die):
-        Player.playerlist.pop(0)
-    print '#### FINAL SURVIVORS ########'
     for player in Player.playerlist:
         print player.strat
 
@@ -223,7 +220,12 @@ def evolve2(numgens, numyears_pergen, num_die):
 ## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
 ## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
 
-evolve2(1000, 10, 3)
+if simple_simulation:
+    do_simple_simulation()
+if evolution:
+    do_evolution(20)
+
+evolve2(1000, 10, 20, 3)
 
 
 
