@@ -7,9 +7,6 @@ prints out initial strategies and strategies of the 15 survivors at the end
 import random
 from strategies import *
 
-## global list of players. i've been warned against using global variables, but seemed like the best way
-playerlist = []
-
 numplayers = 20
 ## decide which program to run
 simplesimulation = False
@@ -36,9 +33,8 @@ strat_list = [mostly_tit_for_tat,
 
 
 
-## player class defined in file classes
-
 class Player(object):
+    playerlist = []
     def __init__(self, name, strat, points=0, plays=None, allplays=None):
         '''points: stores points accrued in a single generation or set of games
         strat = strategy, defined above
@@ -58,9 +54,8 @@ class Player(object):
         else:
             self.allplays = allplays
         ## playerlist gets modified when a player is instantiated, and the correct index is assigned to the player
-        global playerlist
-        playerlist.append(self)
-        self.index = playerlist.index(self)
+        self.playerlist.append(self)
+        self.index = self.playerlist.index(self)
         self.nextplay = None
     def addpoints(self, points):
         self.points += points
@@ -153,15 +148,12 @@ if evolution:
         Player(i, initial_strat)
     ## comment out below for long simulations
     print '####### INITIAL PLAYERS ##########'
-    for player in playerlist:
+    for player in Player.playerlist:
         print player.strat
 
 ## below, randomizing the order of the individual games in a round
-playerorder = range(numplayers)
-
 ## make a new list that's identical to playerlist, but that we can modify without modifying global playerlist
-for i in range(numplayers):
-    playerorder[i] = playerlist[playerorder[i]]
+playorder = Player.playerlist[:]
 
 
 def all_matches():
@@ -180,7 +172,7 @@ def all_matches():
 def play_oneround_randomorder(toPrint=False):
     l = all_matches()
     for tup in l:
-        play(playerlist[tup[0]], playerlist[tup[1]])
+        play(Player.playerlist[tup[0]], Player.playerlist[tup[1]])
     if toPrint:
         print '!!!!!!!!!!!!!!!!!!!ROUND COMPLETED!!!!!!!!!!!!!!'
         print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -202,7 +194,7 @@ def play_each_other(numrounds):
             for i in range(j+1, numplayers):
                 play(playerorder[i], playerorder[j])
 
-def order_players(players=playerlist):
+def order_players(players=Player.playerlist):
     players.sort()
 
 ## one more parameter to decide how many players 'die' after each full round (or 'generation')
@@ -218,19 +210,19 @@ def evolve1(numgens, numyears_pergen):
         order_players()
         for j in range(cruel_selection):
             ## kill off the losers
-            playerlist.pop(0)
+            Player.playerlist.pop(0)
             ## insert randoms
             newstrat = random.choice(strat_list)
             Player(i, newstrat)
             # print 'new strategy ', newstrat
-        for player in playerlist:
+        for player in Player.playerlist:
             player.endgen()
     ## play one more generation without replacing
     play_multiple_rounds(numyears_pergen)
     order_players()
     for j in range(cruel_selection):
-        playerlist.pop(0)
-    for player in playerlist:
+        Player.playerlist.pop(0)
+    for player in Player.playerlist:
         print player.strat
 
 ## incredibly variable results!!
@@ -240,27 +232,27 @@ def evolve2(numgens, numyears_pergen):
      uncomment print statements to see it in action'''
     playernum = numplayers + 1
     for i in range(numgens):
-        for t in range(len(playerlist)):
+        for t in range(len(Player.playerlist)):
             if random.random() < mutation_parameter:
-                playerlist[t].strat = random.choice(strat_list)
+                Player.playerlist[t].strat = random.choice(strat_list)
                 # print 'mutation!!!!'
-                # print 'new strategy= ', playerlist[t].strat
+                # print 'new strategy= ', Player.playerlist[t].strat
         play_multiple_rounds(numyears_pergen)
         order_players()
         for j in range(cruel_selection):
-            playerlist.pop(0)
-            newstrat = playerlist[-j].strat
+            Player.playerlist.pop(0)
+            newstrat = Player.playerlist[-j].strat
             Player(i, newstrat)
             # print 'new strategy = winning strategy =  ', newstrat
-        for player in playerlist:
+        for player in Player.playerlist:
             player.endgen()
     ## play one more generation without replacing
     play_multiple_rounds(numyears_pergen)
     order_players()
     for j in range(cruel_selection):
-        playerlist.pop(0)
+        Player.playerlist.pop(0)
     print '#### FINAL SURVIVORS ########'
-    for player in playerlist:
+    for player in Player.playerlist:
         print player.strat
 
 # def evolve3(numgens, numyears_pergen):
@@ -282,8 +274,8 @@ evolve2(1000, 10)
 # if __name__ == '__main__':
 #
 #     play_multiple_rounds(10)
-#     for i in range(len(playerlist)):
-#         print str(playerlist[i].__str__()) + '\'s'+'points=' + str(playerlist[i].points) + '   ', str(playerlist[i].strat)
+#     for i in range(len(Player.playerlist)):
+#         print str(Player.playerlist[i].__str__()) + '\'s'+'points=' + str(Player.playerlist[i].points) + '   ', str(Player.playerlist[i].strat)
 #     order_players()
 #
 #
@@ -292,8 +284,8 @@ evolve2(1000, 10)
 #
 #
 
-    # print str(playerlist)
-    #     for player in playerlist:
+    # print str(Player.playerlist)
+    #     for player in Player.playerlist:
     #     print player.index
     #     play(player2, player4)
     #     play(player2, player4)
