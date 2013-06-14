@@ -1,10 +1,10 @@
+"""Prisoner's dilemma game, with evolution and selection
+If executed without modification, instantiates 20 players who mostly defect, but the population can
+be invaded by the other strategies over the 1000 'generations' iterated in the function 'evolve2'
+prints out initial strategies and strategies of the 15 survivors at the end
+"""
+
 import random
-
-## prisoner's dilemma game, with evolution and selection
-## if executed without modification, instantiates 20 players who mostly defect, but the population can
-## be invaded by the other strategies over the 1000 'generations' iterated in the function 'evolve2'
-## prints out initial strategies and strategies of the 15 survivors at the end
-
 
 ## global list of players. i've been warned against using global variables, but seemed like the best way
 playerlist = []
