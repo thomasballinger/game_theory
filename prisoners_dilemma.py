@@ -149,49 +149,19 @@ if evolution:
     for player in Player.playerlist:
         print player.strat
 
-## below, randomizing the order of the individual games in a round
-## make a new list that's identical to playerlist, but that we can modify without modifying global playerlist
-playorder = Player.playerlist[:]
-
-
-def all_matches(players):
-    '''list of all matchups in a single round (that is, every player plays every other player once), numteams+1 choose 2 games'''
-    list_tups = list(itertools.combinations(range(len(players)), 2))
-    random.shuffle(list_tups)
-    return list_tups
-
-def play_oneround_randomorder(toPrint=False):
-    l = all_matches(Player.playerlist)
-    for tup in l:
-        play(Player.playerlist[tup[0]], Player.playerlist[tup[1]])
-    if toPrint:
-        print '!!!!!!!!!!!!!!!!!!!ROUND COMPLETED!!!!!!!!!!!!!!'
-        print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-
-## i think the next two functions are identical. im not sure why i defined them both, now, but i'm worried
-#3 they're actually different, so keeping them for now
-
 def play_multiple_rounds(numrounds):
     for t in range(numrounds):
-        play_oneround_randomorder()
-
-
-def play_each_other(numrounds):
-    for t in range(numrounds):
-        random.shuffle(playerorder)
-
-
-        for j in range(numplayers):
-            for i in range(j+1, numplayers):
-                play(playerorder[i], playerorder[j])
+        players = Player.playerlist[:]
+        random.shuffle(players)
+        for p1, p2 in itertools.combinations(players, 2):
+            play(p1, p2)
 
 def order_players(players=Player.playerlist):
     players.sort()
 
 ## one more parameter to decide how many players 'die' after each full round (or 'generation')
-cruel_selection = 3
 
-def evolve1(numgens, numyears_pergen):
+def evolve1(numgens, numyears_pergen, num_die):
     '''numgens = int, number of iterations
     numyears_pergen = int, number of times each team will 'play' before the selection happens'''
     ## new team gets new name
@@ -199,7 +169,7 @@ def evolve1(numgens, numyears_pergen):
     for i in range(numgens):
         play_multiple_rounds(numyears_pergen)
         order_players()
-        for j in range(cruel_selection):
+        for j in range(num_die):
             ## kill off the losers
             Player.playerlist.pop(0)
             ## insert randoms
@@ -211,13 +181,13 @@ def evolve1(numgens, numyears_pergen):
     ## play one more generation without replacing
     play_multiple_rounds(numyears_pergen)
     order_players()
-    for j in range(cruel_selection):
+    for j in range(num_die):
         Player.playerlist.pop(0)
     for player in Player.playerlist:
         print player.strat
 
 ## incredibly variable results!!
-def evolve2(numgens, numyears_pergen):
+def evolve2(numgens, numyears_pergen, num_die):
     '''boots out the losing players, replicates the winning players instead of random ones,
      and mutates each player with a fixed probability
      uncomment print statements to see it in action'''
@@ -230,7 +200,7 @@ def evolve2(numgens, numyears_pergen):
                 # print 'new strategy= ', Player.playerlist[t].strat
         play_multiple_rounds(numyears_pergen)
         order_players()
-        for j in range(cruel_selection):
+        for j in range(num_die):
             Player.playerlist.pop(0)
             newstrat = Player.playerlist[-j].strat
             Player(i, newstrat)
@@ -240,7 +210,7 @@ def evolve2(numgens, numyears_pergen):
     ## play one more generation without replacing
     play_multiple_rounds(numyears_pergen)
     order_players()
-    for j in range(cruel_selection):
+    for j in range(num_die):
         Player.playerlist.pop(0)
     print '#### FINAL SURVIVORS ########'
     for player in Player.playerlist:
@@ -253,7 +223,7 @@ def evolve2(numgens, numyears_pergen):
 ## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
 ## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
 
-evolve2(1000, 10)
+evolve2(1000, 10, 3)
 
 
 
