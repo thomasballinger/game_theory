@@ -82,21 +82,21 @@ def play(player1, player2):
     player2.decideplay(player1)
     player1play = player1.makeplay(player2)
     player2play = player2.makeplay(player1)
+
     ## assign points based on prisoner's dilemma
     if player1play == player2play == 'defect':
         player1.addpoints(both_defect_payoff)
         player2.addpoints(both_defect_payoff)
-        #print 'both defect'
     elif player1play == 'defect' and player2play == 'cooperate':
         player1.addpoints(defect_payoff_if_opp_cooperates)
-        #print 'first player defects, second cooperateerates'
     elif player2play == 'defect' and player1play == 'cooperate':
         player2.addpoints(defect_payoff_if_opp_cooperates)
-        #print 'first player cooperateerates, second defects'
-    else:
-        #print 'both cooperateerate'
+    elif player2play == player1play == 'cooperate':
         player1.addpoints(both_cooperate_payoff)
         player2.addpoints(both_cooperate_payoff)
+    else:
+        raise Exception("bad play strings: %s %s", player1play, player2play)
+
     logging.info('player1 points after playing %d', player1.points)
     logging.info('player2 points after playing %d', player2.points)
     logging.info('############# next match ##########')
