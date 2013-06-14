@@ -39,7 +39,7 @@ strat_list = [mostly_tit_for_tat,
 ## player class defined in file classes
 
 class Player(object):
-    def __init__(self,name,strat,points = 0, plays = None, allplays = None):
+    def __init__(self, name, strat, points=0, plays=None, allplays=None):
         '''points: stores points accrued in a single generation or set of games
         strat = strategy, defined above
         plays =  list of lists storing plays made against each opponent
@@ -62,19 +62,19 @@ class Player(object):
         playerlist.append(self)
         self.index = playerlist.index(self)
         self.nextplay = None
-    def addpoints(self,points):
+    def addpoints(self, points):
         self.points += points
 
-    def decideplay(self,opp):
-        play = self.strat(self,opp)
+    def decideplay(self, opp):
+        play = self.strat(self, opp)
         self.nextplay = play
         return play
-    def makeplay(self,opp):
+    def makeplay(self, opp):
         play = self.nextplay
         self.allplays.append(play)
         self.plays[opp.index].append(play)
         return play
-    def __lt__(self,other):
+    def __lt__(self, other):
         return self.points < other.points
     def endgen(self):
         '''when a generation or full round is over, restore points to 0'''
@@ -86,14 +86,14 @@ class Player(object):
 ## game functions
 
 ## a single encounter consists of 1 game, described below
-def play(player1,player2, toPrint1 = False, toPrint2 = False):
+def play(player1, player2, toPrint1=False, toPrint2=False):
     ## debugging
     if toPrint2:
         print 'player '+str(player1.__str__())+' vs '+str(player2.__str__())
         print 'player1 points before playing ', player1.points
         print 'player2 points before playing ', player2.points
         if len(player1.allplays) >= numplayers - 1:
-            print 'last matchup between the players', player1.plays[player2.index][-1],player2.plays[player1.index][-1]
+            print 'last matchup between the players', player1.plays[player2.index][-1], player2.plays[player1.index][-1]
 
     if player1 == player2:
         return None
@@ -134,14 +134,14 @@ def play(player1,player2, toPrint1 = False, toPrint2 = False):
 
 ## define some players for a simple simulation
 if simplesimulation:
-    player1 = Player(1,tit_for_tat_2)
-    player2 = Player('titfortat2',tit_for_tat_2)
-    player3 = Player('defect',mostly_defect)
-    player4 = Player('clever',clever)
-    player5 = Player('mostly random',mostlyrandomplay)
-    player6 = Player('titfortat opp',tit_for_tat_opp)
-    player7 = Player('mostly cooperate',mostly_cooperate)
-    player8 = Player('mostly titfortat',mostly_tit_for_tat)
+    player1 = Player(1, tit_for_tat_2)
+    player2 = Player('titfortat2', tit_for_tat_2)
+    player3 = Player('defect', mostly_defect)
+    player4 = Player('clever', clever)
+    player5 = Player('mostly random', mostlyrandomplay)
+    player6 = Player('titfortat opp', tit_for_tat_opp)
+    player7 = Player('mostly cooperate', mostly_cooperate)
+    player8 = Player('mostly titfortat', mostly_tit_for_tat)
 
 
 ## for the evolution scenario
@@ -150,7 +150,7 @@ if evolution:
     ## modify the initial strategy to see which strategies are prone to invasion, or make it random
     initial_strat = mostly_defect
     for i in range(numplayers):
-        Player(i,initial_strat)
+        Player(i, initial_strat)
     ## comment out below for long simulations
     print '####### INITIAL PLAYERS ##########'
     for player in playerlist:
@@ -169,18 +169,18 @@ def all_matches():
     list_tups = []
     # print numplayers
     for j in range(numplayers):
-        for i in range(j+1,numplayers):
-            list_tups.append((i,j))
+        for i in range(j+1, numplayers):
+            list_tups.append((i, j))
 
     random.shuffle(list_tups)
     return list_tups
 
 
 
-def play_oneround_randomorder(toPrint = False):
+def play_oneround_randomorder(toPrint=False):
     l = all_matches()
     for tup in l:
-        play(playerlist[tup[0]],playerlist[tup[1]])
+        play(playerlist[tup[0]], playerlist[tup[1]])
     if toPrint:
         print '!!!!!!!!!!!!!!!!!!!ROUND COMPLETED!!!!!!!!!!!!!!'
         print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -199,16 +199,16 @@ def play_each_other(numrounds):
 
 
         for j in range(numplayers):
-            for i in range(j+1,numplayers):
-                play(playerorder[i],playerorder[j])
+            for i in range(j+1, numplayers):
+                play(playerorder[i], playerorder[j])
 
-def order_players(players = playerlist):
+def order_players(players=playerlist):
     players.sort()
 
 ## one more parameter to decide how many players 'die' after each full round (or 'generation')
 cruel_selection = 3
 
-def evolve1(numgens,numyears_pergen):
+def evolve1(numgens, numyears_pergen):
     '''numgens = int, number of iterations
     numyears_pergen = int, number of times each team will 'play' before the selection happens'''
     ## new team gets new name
@@ -221,7 +221,7 @@ def evolve1(numgens,numyears_pergen):
             playerlist.pop(0)
             ## insert randoms
             newstrat = random.choice(strat_list)
-            Player(i,newstrat)
+            Player(i, newstrat)
             # print 'new strategy ', newstrat
         for player in playerlist:
             player.endgen()
@@ -234,7 +234,7 @@ def evolve1(numgens,numyears_pergen):
         print player.strat
 
 ## incredibly variable results!!
-def evolve2(numgens,numyears_pergen):
+def evolve2(numgens, numyears_pergen):
     '''boots out the losing players, replicates the winning players instead of random ones,
      and mutates each player with a fixed probability
      uncomment print statements to see it in action'''
@@ -250,7 +250,7 @@ def evolve2(numgens,numyears_pergen):
         for j in range(cruel_selection):
             playerlist.pop(0)
             newstrat = playerlist[-j].strat
-            Player(i,newstrat)
+            Player(i, newstrat)
             # print 'new strategy = winning strategy =  ', newstrat
         for player in playerlist:
             player.endgen()
@@ -263,14 +263,14 @@ def evolve2(numgens,numyears_pergen):
     for player in playerlist:
         print player.strat
 
-# def evolve3(numgens,numyears_pergen):
+# def evolve3(numgens, numyears_pergen):
 
 
 
 ## these results are kinda crazy. different each time. next step: run many versions of evolve2 and collect
 ## results in a histogram, find out distribution of results/ strategies that do well more often, etc.
 
-evolve2(1000,10)
+evolve2(1000, 10)
 
 
 
@@ -283,7 +283,7 @@ evolve2(1000,10)
 #
 #     play_multiple_rounds(10)
 #     for i in range(len(playerlist)):
-#         print str(playerlist[i].__str__()) + '\'s'+'points=' + str(playerlist[i].points) + '   ',str(playerlist[i].strat)
+#         print str(playerlist[i].__str__()) + '\'s'+'points=' + str(playerlist[i].points) + '   ', str(playerlist[i].strat)
 #     order_players()
 #
 #
@@ -295,16 +295,16 @@ evolve2(1000,10)
     # print str(playerlist)
     #     for player in playerlist:
     #     print player.index
-    #     play(player2,player4)
-    #     play(player2,player4)
-    #     play(player4,player5)
+    #     play(player2, player4)
+    #     play(player2, player4)
+    #     play(player4, player5)
     #     print 'player 4 plays', player4.plays
     #     print 'player 2 plays', player2.plays
     #     print 'player 5 plays', player5.plays
     #
     #
     #     print 'player2 points', player2.points
-    #     print 'player 4 points',player4.points
+    #     print 'player 4 points', player4.points
     #     print 'player 5 points', player5.points
 
 
