@@ -18,11 +18,11 @@ class Player(object):
         self.name = name
         self.strat = strat
         self.points = points
-        if plays == None:
+        if plays is None:
             self.plays = [[] for _ in range(num_rounds)]
         else:
             self.plays = plays
-        if allplays == None:
+        if allplays is None:
             self.allplays = []
         else:
             self.allplays = allplays
@@ -68,7 +68,7 @@ def play(player1, player2, toPrint1=False, toPrint2=False):
         if len(player1.allplays) >= len(Player.playerlist) - 1:
             print 'last matchup between the players', player1.plays[player2.index][-1], player2.plays[player1.index][-1]
 
-    if player1 == player2:
+    if player1 is player2:
         return None
 
     if toPrint1:
